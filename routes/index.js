@@ -23,16 +23,22 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/usermsg', function(req, res, next) {
+  console.log(req.body);
+
+  SupportKit.messages.create(req.body.items[0].authorId, {"text":req.body.items[0].text, "author":"mike@supportkit.io"}, "appMaker", jwt);
+
   res.status(200).send("OK");
 });
 
 router.post('/setupwebhooks', function(req, res, next) {
 	SupportKit.webhooks.list(appToken, jwt).then(function(hooks) {
+		console.log(hooks);
+		
 		if(hooks.length && (hooks.length != 1 || hooks[0].target != webhookTarget)) {
 			clearWebHooks(hooks);
-			SupportKit.webhooks.create(appToken, webhookTarget, jwt, {"events": ["message"]});  
+			SupportKit.webhooks.create(appToken, webhookTarget, jwt, {"events": ["message:appUser"]});  
 		} else if(hooks.length == 0) {
-			SupportKit.webhooks.create(appToken, webhookTarget, jwt, {"events": ["message"]});  
+			SupportKit.webhooks.create(appToken, webhookTarget, jwt, {"events": ["message:appUser"]});  
 		}
 	});
 
